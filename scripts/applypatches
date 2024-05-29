@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+cd $PROJECTPATH/versions/deps/
+mkdir -p $PROJECTPATH/migration/applied
+
+for i in `ls $PROJECTPATH/migration/patch/`; do
+
+	patch -p1 < $PROJECTPATH/migration/patch/$i
+	mv $PROJECTPATH/migration/patch/$i $PROJECTPATH/migration/applied/
+
+done

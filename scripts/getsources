@@ -1,0 +1,27 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+VERSION=$(get_version)
+PACKAGE=$1
+
+if [ ! -d "$PROJECTPATH/versions/deps/original" ]; then
+	echo "SPECs for version $VERSION not generated"
+	exit 1
+fi
+
+echo "Fetching sources for version $VERSION"
+
+cd "$PROJECTPATH/versions/deps/"
+
+if [[ $PACKAGE == "" ]];then
+	for i in `ls *.spec`;do 
+		spectool -gR --define "_topdir $PROJECTPATH/rpmbuilds/$VERSION/" $i 
+	done
+else
+	if [ -f $PACKAGE.spec ];then
+		spectool -gR --define "_topdir $PROJECTPATH/rpmbuilds/$VERSION/" $PACKAGE.spec
+	else
+		spectool -gR --define "_topdir $PROJECTPATH/rpmbuilds/$VERSION/" python-$PACKAGE.spec
+	fi
+fi

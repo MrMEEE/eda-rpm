@@ -1,0 +1,3 @@
+source $(dirname "$0")/common-functions
+
+echo $(get_python)

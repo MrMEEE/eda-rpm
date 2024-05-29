@@ -1,0 +1,38 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+VERSION=$(get_version)
+
+ARG1=$1
+ARG2=$2
+
+RPMPACKAGE=$1
+
+if [ ! -d "$PROJECTPATH/versions/deps" ]; then
+        echo "SPECs for version $VERSION not generated"
+        exit 1
+fi
+
+if [ ! -f "$PROJECTPATH/rpmbuilds/$VERSION/SRPMS/$RPMPACKAGE" ];then
+	SRPMALT=$(echo $SRPM |sed 's/python/python3/g')
+	if [ ! -f "$PROJECTPATH/rpmbuilds/$VERSION/SRPMS/$SRPMALT" ];then
+		echo "Source file: $PROJECTPATH/rpmbuilds/$VERSION/SRPMS/$RPMPACKAGE, doesn't exist.."
+		exit 2
+	else
+		SRPM=$SRPMALT
+	fi
+fi
+
+mkdir -p "$PROJECTPATH/rpmbuilds/$VERSION/RPMS/"
+
+cd "$PROJECTPATH/rpmbuilds/$VERSION/RPMS/"
+
+mock -r epel-9-x86_64 --clean &> /dev/null 
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+build_rpm $RPMPACKAGE
+

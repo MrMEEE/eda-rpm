@@ -1,0 +1,21 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+PACKAGENAME=$1
+
+if [ ! -f $PROJECTPATH/versions/deps/python-$PACKAGENAME.spec ]; then
+	if [ ! -f $PROJECTPATH/versions/deps/python3-$PACKAGENAME.spec ]; then
+		echo "Package $PACKAGENAME doesn't exist"
+		exit 0
+	else
+		FILENAME=python3-$PACKAGENAME
+	fi
+else
+	FILENAME=python-$PACKAGENAME
+fi
+
+sed -i "/^%pyproject_extras_subpkg/d" $PROJECTPATH/versions/deps/$FILENAME.spec
+sed -i "s/^%pyproject_buildrequires.*/%pyproject_buildrequires/g" $PROJECTPATH/versions/deps/$FILENAME.spec
+
+$PROJECTPATH/new-scripts/buildsrc $FILENAME
