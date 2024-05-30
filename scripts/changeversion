@@ -9,7 +9,7 @@ PACKAGENAME=$3
 echo "Currently on version $OLDVERSION"
 
 if [ -z "$1" ]; then
-        echo "Please provide AWX version"
+        echo "Please provide $PROJECTNAME version"
 	echo
 	cd $PROJECTPATH/versions/
 	git branch -rv |cut -f2- -d\/
@@ -24,11 +24,14 @@ fi
 
 $(dirname "$0")/checkbuilds all md $BUILDSTATUS $PACKAGENAME > $PROJECTPATH/versions/README.md
 
+mkdir -p /opt/eda-rpm/versions/eda-rpm
+
 cd $PROJECTPATH/versions/
+git add $PROJECTPATH/versions/PYTHON
 git add $PROJECTPATH/versions/README.md
 git add $PROJECTPATH/versions/deps
 git add $PROJECTPATH/versions/logs
-git add $PROJECTPATH/versions/awx-rpm
+git add $PROJECTPATH/versions/$PROJECTPACKAGENAME
 
 echo "Publishing Package build changes"
 git commit -qam "Publishing build changes for version: `cat $PROJECTPATH/working-version`" &> /dev/null 
@@ -46,13 +49,13 @@ else
 	VERSIONEXISTS=0
 fi
 
-cd $PROJECTPATH/awx/
+cd $PROJECTPATH/$PROJECTNAME/
 
 git checkout -q devel
 git pull -q
 
-if [ `git tag |grep $VERSION` ]; then
-        git -c advice.detachedHead=false checkout $VERSION
+if [ `git tag |grep $TAGPREFIX$VERSION` ]; then
+        git -c advice.detachedHead=false checkout $TAGPREFIX$VERSION
 	echo "Version changed to: $VERSION"
 	if [[ $VERSIONEXISTS == 0 ]];then
 		echo "Creating New Version"
@@ -61,6 +64,7 @@ if [ `git tag |grep $VERSION` ]; then
 		touch $PROJECTPATH/versions/VERSION-$VERSION
 		git add $PROJECTPATH/versions/VERSION-$VERSION
 		git commit -am "Created version: $VERSION"
+		git push --set-upstream origin $VERSION
 	fi
 else
         echo "Version $VERSION doesn't exist"

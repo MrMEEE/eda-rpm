@@ -1,0 +1,10 @@
+#!/bin/bash
+
+dnf -y install virtualenv
+
+source $(dirname "$0")/common-functions
+
+python3.11 -m venv $PROJECTPATH/virtualenv
+source $PROJECTPATH/virtualenv/bin/activate
+
+pip install poetry

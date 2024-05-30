@@ -35,4 +35,4 @@ if [[ "${WHERE}" == both ]] || [[ "${WHERE}" == runtime ]]; then
         sed -i "0,/BuildRequires/s//Requires: $(echo $DEPENDENCY)\n&/" $PROJECTPATH/versions/deps/$FILENAME.spec
 fi
 
-$PROJECTPATH/new-scripts/buildsrc $FILENAME
+$PROJECTPATH/scripts/buildsrc $FILENAME

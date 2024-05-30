@@ -1,0 +1,6 @@
+Generate Specfiles from Poetry
+./pypi2spec
+Align Packageversions
+./alignversions
+Fetch source files
+./getsources

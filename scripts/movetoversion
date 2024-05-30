@@ -92,9 +92,9 @@ git commit -qam "Created Version $NEWVERSION"
 
 git push -u origin $NEWVERSION
 
-$PROJECTPATH/new-scripts/changeversion $NEWVERSION
+$PROJECTPATH/scripts/changeversion $NEWVERSION
 
-$PROJECTPATH/new-scripts/pypi2spec
+$PROJECTPATH/scripts/pypi2spec
 for i in `cat $PROJECTPATH/migration/extra-deps.txt`; do
 
 	PACKAGENAME=$(echo $i | cut -f1 -d=)
@@ -102,9 +102,9 @@ for i in `cat $PROJECTPATH/migration/extra-deps.txt`; do
 	
 	echo "Adding package $PACKAGENAME $VERSION"
 	if [[ "$PACKAGENAME" == "$VERSION" ]];then
-		$PROJECTPATH/new-scripts/addpackage $PACKAGENAME nobuild
+		$PROJECTPATH/scripts/addpackage $PACKAGENAME nobuild
 	else 
-		$PROJECTPATH/new-scripts/addpackage $PACKAGENAME $VERSION nobuild
+		$PROJECTPATH/scripts/addpackage $PACKAGENAME $VERSION nobuild
 	fi
 
 done
@@ -130,9 +130,9 @@ git add $PROJECTPATH/versions/*
 git commit -qam "Imported from version $FROMVERSION to version $NEWVERSION"
 git push
 
-$PROJECTPATH/new-scripts/getsources
+$PROJECTPATH/scripts/getsources
 
 echo "Applying patches from version: $FROMVERSION"
 
-$PROJECTPATH/new-scripts/applypatches
+$PROJECTPATH/scripts/applypatches
 

@@ -36,4 +36,4 @@ sed -i "/# START RENAMING OF BINARIES 2/,/# END RENAMING OF BINARIES 2/d" $PROJE
 sed -i "/%pyproject_save_files/i $BEFORE" $PROJECTPATH/versions/deps/$FILENAME.spec
 sed -i "/%pyproject_save_files/a $AFTER" $PROJECTPATH/versions/deps/$FILENAME.spec
 
-$PROJECTPATH/new-scripts/buildsrc $FILENAME
+$PROJECTPATH/scripts/buildsrc $FILENAME

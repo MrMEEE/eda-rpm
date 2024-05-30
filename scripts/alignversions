@@ -1,0 +1,56 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+PROJECT=$1
+PROJECTVERSION=$2
+
+if [[ "$PROJECT" == "" ]]; then
+	echo "Project not specified"
+	exit 2
+fi
+
+if [ ! -d $PROJECTPATH/../$PROJECT ];then
+	echo "Project $1, doesn't exist"
+	exit 1
+fi
+
+if [[ "$PROJECTVERSION" != "" ]]; then
+        echo "Switching $PROJECT to version: $PROJECTVERSION"
+	$PROJECTPATH/../$PROJECT/SCRIPTS/changeversion $PROJECTVERSION
+fi
+
+for dependency in `ls $PROJECTPATH/versions/deps/*.spec`; do
+
+	SPECFILE=$(basename $dependency)
+
+	if [ -f $PROJECTPATH/../$PROJECT/versions/deps/$SPECFILE ]; then
+		echo "$SPECFILE exist in both projects"
+		THISPROJECTVERSION=$(cat $PROJECTPATH/versions/deps/$SPECFILE |grep Version: | cut -f2 -d: | awk '{$1=$1};1')
+		OTHERPROJECTVERSION=$(cat $PROJECTPATH/../$PROJECT/versions/deps/$SPECFILE |grep Version: | cut -f2 -d: | awk '{$1=$1};1')
+		if [[ "$THISPROJECTVERSION" == "$OTHERPROJECTVERSION" ]];then
+			echo "Version for $SPECFILE is already aligned"
+		else
+			CHOOSE=1
+                	while [[ $CHOOSE = 1 ]]; do
+				echo
+				echo "Please select version for $SPECFILE"
+				echo "1) Use version $THISPROJECTVERSION from $PROJECTNAME"
+				echo "2) Use version $OTHERPROJECTVERSION from $PROJECT"
+				echo
+				echo -n "Enter your choice: "
+				read CHOICE
+				if [[ "$CHOICE" == "1" ]] ; then
+					CHOOSE=0
+				elif [[ "$CHOICE" == "2" ]]; then
+					CHOOSE=0
+					cp -f $PROJECTPATH/../$PROJECT/versions/deps/$SPECFILE $PROJECTPATH/versions/deps/$SPECFILE
+				else
+					echo "Invalid answer, try again"
+				fi
+			done
+		fi
+
+		
+	fi 
+done

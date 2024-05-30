@@ -22,7 +22,22 @@ echo "$ROOT_PATH"
 
 # Initialize
 
-$PROJECTPATH=$(get_path)
+PROJECTPATH=$(get_path)
+
+if [ ! -f $PROJECTPATH/config ];then
+	echo "Configuration file: $PROJECTPATH/config is not present"
+	exit 1
+else
+	source $PROJECTPATH/config
+	if [[ "$PROJECTNAME" == "" ]];then
+		echo "Project name is not defined in $PROJECTPATH/config"
+		exit 2
+	fi
+fi
+
+if [ -d $PROJECTPATH/virtualenv ]; then
+	source $PROJECTPATH/virtualenv/bin/activate
+fi
 
 get_version () {
 
@@ -71,6 +86,6 @@ build_rpm () {
 	createrepo_c $PROJECTPATH/rpmbuilds/$VERSION/RPMS/ >> $PROJECTPATH/versions/logs/$1.log 2>&1
 	rm -f $PROJECTPATH/rpmbuilds/$VERSION/RPMS-TMP/* >> $PROJECTPATH/versions/logs/$1.log 2>&1
 	mock -r epel-9-x86_64 --clean >> $PROJECTPATH/versions/logs/$1.log 2>&1
-	$PROJECTPATH/new-scripts/changeversion save $BUILDSTATUS $1 
+	$PROJECTPATH/scripts/changeversion save $BUILDSTATUS $1 
 }
 

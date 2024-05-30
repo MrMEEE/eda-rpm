@@ -1,3 +1,7 @@
+#!/bin/bash
+
 source $(dirname "$0")/common-functions
 
-echo $(get_python)
+cd $PROJECTPATH/$PROJECTNAME
+
+poetry run pip list

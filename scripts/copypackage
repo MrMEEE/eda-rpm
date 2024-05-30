@@ -1,0 +1,27 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+PROJECT=$1
+PACKAGENAME=$2
+
+if [[ "$PROJECT" == "" ]]; then
+	echo "Project not specified"
+	exit 2
+fi
+
+if [[ "$PACKAGENAME" == "" ]]; then
+        echo "Packagename not specified"
+        exit 3
+fi
+
+if [ ! -d $PROJECTPATH/../$PROJECT ];then
+	echo "Project $1, doesn't exist"
+	exit 1
+fi
+
+if [ ! -d $PROJECTPATH/../$PROJECT/versions/deps/python-$PACKAGENAME.spec ];then
+	echo "Package: $PACKAGENAME does not exist in project $PROJECT"
+	
+fi 
+

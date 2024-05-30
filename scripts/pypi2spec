@@ -4,27 +4,44 @@ source $(dirname "$0")/common-functions
 
 VERSION=$(get_version)
 
+PYTHONBUILD=$(get_python)
+
 echo "Generating SPECs for version $VERSION"
 
 PACKAGE=$1
 PACKAGEVERSION=$2
 
-cd $PROJECTPATH/awx/
+id $PROJECTPATH/$PROJECTNAME/
 
 git stash
 git checkout -f -q devel
 git pull -q
 
-if [ `git tag |grep $VERSION` ]; then
-	git -c advice.detachedHead=false checkout -q $VERSION
+if [ `git tag |grep $TAGPREFIX$VERSION` ]; then
+	git -c advice.detachedHead=false checkout -q $TAGPREFIX$VERSION
 else
 	echo "Version $VERSION doesn't exist"
 	exit 1
 fi
 
 mkdir -p $PROJECTPATH/versions/deps
+mkdir -p $PROJECTPATH/versions/deps/extra-sources
+touch $PROJECTPATH/versions/deps/extra-deps.txt
+touch $PROJECTPATH/versions/deps/remove-deps.txt
 
-cat $PROJECTPATH/awx/requirements/requirements.txt | grep -v "#" > $PROJECTPATH/versions/deps/requirements.txt
+if [[ "$PACKAGEMANAGER" == "poetry" ]]; then
+
+	poetry export --without-hashes --format=requirements.txt | cut -f1 -d";" > $PROJECTPATH/versions/deps/requirements.txt
+
+elif [[ "$PACKAGEMANAGER" == "require" ]];then
+
+	cat $PROJECTPATH/$PROJECTNAME/$REQUIREPATH/requirements.txt | grep -v "#" > $PROJECTPATH/versions/deps/requirements.txt
+
+else
+
+	echo "PACKAGEMANAGER not defined in config, set to either 'poetry' or 'require'"	
+
+fi
 
 cd $PROJECTPATH/versions/deps/
 mkdir -p $PROJECTPATH/versions/deps/original
@@ -33,17 +50,17 @@ if [[ $PACKAGE == "" ]];then
 		PACKAGE=$(echo $i | cut -f1 -d"=") 
 		PACKAGEVERSION=$(echo $i | cut -f3 -d"=")
 		echo "Generating SPEC-file for $PACKAGE version $PACKAGEVERSION"
-		pyp2spec -p 3.11 --license gpl -v $PACKAGEVERSION $PACKAGE 
+		pyp2spec -p $PYTHONBUILD --license gpl -v $PACKAGEVERSION $PACKAGE 
 		cp $PROJECTPATH/versions/deps/*$PACKAGE.spec $PROJECTPATH/versions/deps/*$PACKAGE.conf $PROJECTPATH/versions/deps/original/
 	done
 else
         if [[ $PACKAGEVERSION == "" ]];then
 		echo "Generating SPEC-file for $PACKAGE"
-        	pyp2spec -p 3.11 --license gpl $PACKAGE
+        	pyp2spec -p $PYTHONBUILD  --license gpl $PACKAGE
 		cp $PROJECTPATH/versions/deps/*$PACKAGE.spec $PROJECTPATH/versions/deps/*$PACKAGE.conf $PROJECTPATH/versions/deps/original/
 	else
 		echo "Generating SPEC-file for $PACKAGE version $PACKAGEVERSION"
-	        pyp2spec -p 3.11 --license gpl -v $PACKAGEVERSION $PACKAGE
+	        pyp2spec -p $PYTHONBUILD --license gpl -v $PACKAGEVERSION $PACKAGE
 		cp $PROJECTPATH/versions/deps/*$PACKAGE.spec $PROJECTPATH/versions/deps/*$PACKAGE.conf $PROJECTPATH/versions/deps/original/
 	fi
 fi

@@ -18,4 +18,4 @@ fi
 sed -i "/^%pyproject_extras_subpkg/d" $PROJECTPATH/versions/deps/$FILENAME.spec
 sed -i "s/^%pyproject_buildrequires.*/%pyproject_buildrequires/g" $PROJECTPATH/versions/deps/$FILENAME.spec
 
-$PROJECTPATH/new-scripts/buildsrc $FILENAME
+$PROJECTPATH/scripts/buildsrc $FILENAME

@@ -19,4 +19,4 @@ fi
 
 sed -i '1i%global debug_package %{nil}' $PROJECTPATH/versions/deps/$FILENAME.spec
 
-$PROJECTPATH/new-scripts/buildsrc $FILENAME
+$PROJECTPATH/scripts/buildsrc $FILENAME

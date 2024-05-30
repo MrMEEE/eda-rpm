@@ -54,7 +54,7 @@ while [[ $REDOBUILD == 1 ]]; do
 		NEWPACKAGES=0
 	else
 		echo "No new packages has been build in this run."
-		$PROJECTPATH/new-scripts/checkbuilds
+		$PROJECTPATH/scripts/checkbuilds
 		REDOBUILD=0
 		NEWPACKAGES=0
 	fi
