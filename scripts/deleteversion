@@ -1,0 +1,31 @@
+#!/bin/bash
+
+source $(dirname "$0")/common-functions
+
+DELETEVERSION=$1
+
+if [ -z "$DELETEVERSION" ]; then
+        echo "Please specify version to delete"
+        exit 1
+fi
+
+if [[ `cd $PROJECTPATH/versions/ && git branch -rv |cut -f2- -d\/ |grep $DELETEVERSION | wc -l` -eq 0 ]]; then
+	echo "Version $DELETEVERSION doesn't exist"
+	exit 2
+fi
+
+CURRENTVERSION=$(cd $PROJECTPATH/versions/ && git rev-parse --abbrev-ref HEAD)
+
+if [[ "$CURRENTVERSION" == "$DELETEVERSION" ]]; then
+	echo "The version to delete is the current selected, please change to another version"
+	exit 3
+fi
+
+if $(cd $PROJECTPATH/versions/ && git branch -d $DELETEVERSION); then
+	echo "Local version deleted"
+fi
+
+if $(cd $PROJECTPATH/versions/ && git push origin -d $DELETEVERSION); then
+        echo "Remote version deleted"
+fi 
+

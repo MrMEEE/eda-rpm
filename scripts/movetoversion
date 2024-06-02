@@ -29,35 +29,35 @@ else
 fi
 
 if [ -z "$NEWVERSION" ]; then
-        echo "Please provide New AWX version"
+        echo "Please provide New $PROJECTNAME version"
         echo "Select from"
 	echo
-        cd $PROJECTPATH/awx/
+        cd $PROJECTPATH/$PROJECTNAME/
         git ls-remote --tags origin | cut -f3- -d\/ |grep -v "{}" |sort -Vr
 	#git branch -rv |cut -f2- -d\/
         exit 1
 fi
 
-if [[ "`cd $PROJECTPATH/awx/ && git ls-remote --tags origin | cut -f3- -d\/ |grep -v "{}" | grep -x $NEWVERSION |wc -l`" != "1" ]]; then
+if [[ "`cd $PROJECTPATH/$PROJECTNAME/ && git ls-remote --tags origin | cut -f3- -d\/ |grep -v "{}" | grep -x $NEWVERSION |wc -l`" != "1" ]]; then
 	echo "Version: $NEWVERSION doesn't exist"
 	exit 1
 fi
 
 rm -rf $PROJECTPATH/migration
-mkdir -p $PROJECTPATH/migration/{source,orig,conf,patch,awx-rpm}
+mkdir -p $PROJECTPATH/migration/{source,orig,conf,patch,$PROJECTPACKAGENAME}
 cp -ar $PROJECTPATH/versions/deps/extra-sources $PROJECTPATH/migration
 mkdir -p $PROJECTPATH/rpmbuilds/$NEWVERSION/SOURCES/
 cp $PROJECTPATH/versions/deps/extra-sources/* $PROJECTPATH/rpmbuilds/$NEWVERSION/SOURCES/
 cp $PROJECTPATH/versions/PYTHON $PROJECTPATH/migration/
-if [ -d $PROJECTPATH/versions/awx-rpm ]; then
-	for i in `ls $PROJECTPATH/versions/awx-rpm/*-$FROMVERSION | xargs -n 1 basename`;do
+if [ -d $PROJECTPATH/versions/$PROJECTPACKAGENAME ]; then
+	for i in `ls $PROJECTPATH/versions/$PROJECTPACKAGENAME/*-$FROMVERSION | xargs -n 1 basename`;do
 		FILENAME=$(echo $i | sed "s/-$FROMVERSION/-$NEWVERSION/g")
-		cp $PROJECTPATH/versions/awx-rpm/$i $PROJECTPATH/migration/awx-rpm/$FILENAME
+		cp $PROJECTPATH/versions/$PROJECTPACKAGENAME/$i $PROJECTPATH/migration/$PROJECTPACKAGENAME/$FILENAME
 	done
 fi
 
 cp -a $PROJECTPATH/versions/deps/*.spec $PROJECTPATH/migration/source/
-rm -f $PROJECTPATH/migration/source/awx*
+rm -f $PROJECTPATH/migration/source/$PROJECTPACKAGENAME*
 for i in `ls $PROJECTPATH/migration/source/`;do
 	if [ -f $PROJECTPATH/versions/deps/original/$i ];then
 		cp $PROJECTPATH/versions/deps/original/$i $PROJECTPATH/migration/orig/
@@ -113,8 +113,8 @@ cp $PROJECTPATH/migration/remove-deps.txt $PROJECTPATH/versions/deps/remove-deps
 cp $PROJECTPATH/migration/rhel-deps.txt $PROJECTPATH/versions/deps/rhel-deps.txt
 cp -ar $PROJECTPATH/migration/extra-sources $PROJECTPATH/versions/deps/
 cp $PROJECTPATH/migration/PYTHON $PROJECTPATH/versions/PYTHON
-mkdir -p $PROJECTPATH/versions/awx-rpm
-cp $PROJECTPATH/migration/awx-rpm/* $PROJECTPATH/versions/awx-rpm/
+mkdir -p $PROJECTPATH/versions/$PROJECTPACKAGENAME
+cp $PROJECTPATH/migration/awx-rpm/* $PROJECTPATH/versions/$PROJECTPACKAGENAME/
 
 for i in `cat $PROJECTPATH/migration/remove-deps.txt $PROJECTPATH/migration/rhel-deps.txt`; do
 	PACKAGENAME=$(echo $i | sed "s/python//g" | sed "s/python3//g")

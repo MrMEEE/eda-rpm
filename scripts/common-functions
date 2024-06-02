@@ -22,7 +22,9 @@ echo "$ROOT_PATH"
 
 # Initialize
 
-PROJECTPATH=$(get_path)
+if [[ $PROJECTPATH == "" ]];then
+	PROJECTPATH=$(get_path)
+fi
 
 if [ ! -f $PROJECTPATH/config ];then
 	echo "Configuration file: $PROJECTPATH/config is not present"

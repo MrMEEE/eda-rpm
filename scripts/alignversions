@@ -4,6 +4,7 @@ source $(dirname "$0")/common-functions
 
 PROJECT=$1
 PROJECTVERSION=$2
+COPY=$3
 
 if [[ "$PROJECT" == "" ]]; then
 	echo "Project not specified"
@@ -15,7 +16,7 @@ if [ ! -d $PROJECTPATH/../$PROJECT ];then
 	exit 1
 fi
 
-if [[ "$PROJECTVERSION" != "" ]]; then
+if [[ "$PROJECTVERSION" != "" ]] && [[ "$PROJECTVERSION" != "stay" ]]; then
         echo "Switching $PROJECT to version: $PROJECTVERSION"
 	$PROJECTPATH/../$PROJECT/SCRIPTS/changeversion $PROJECTVERSION
 fi
@@ -30,6 +31,10 @@ for dependency in `ls $PROJECTPATH/versions/deps/*.spec`; do
 		OTHERPROJECTVERSION=$(cat $PROJECTPATH/../$PROJECT/versions/deps/$SPECFILE |grep Version: | cut -f2 -d: | awk '{$1=$1};1')
 		if [[ "$THISPROJECTVERSION" == "$OTHERPROJECTVERSION" ]];then
 			echo "Version for $SPECFILE is already aligned"
+			if [[ "$COPY" == "copy" ]]; then
+				echo "Copying spec file anyways.."
+				cp -f $PROJECTPATH/../$PROJECT/versions/deps/$SPECFILE $PROJECTPATH/versions/deps/$SPECFILE			
+			fi
 		else
 			CHOOSE=1
                 	while [[ $CHOOSE = 1 ]]; do
