@@ -46,6 +46,9 @@ fi
 rm -rf $PROJECTPATH/migration
 mkdir -p $PROJECTPATH/migration/{source,orig,conf,patch,$PROJECTPACKAGENAME}
 cp -ar $PROJECTPATH/versions/deps/extra-sources $PROJECTPATH/migration
+if [ -f $PROJECTPATH/versions/PYTHON ];then
+	cp $PROJECTPATH/versions/PYTHON $PROJECTPATH/migration
+fi
 mkdir -p $PROJECTPATH/rpmbuilds/$NEWVERSION/SOURCES/
 cp $PROJECTPATH/versions/deps/extra-sources/* $PROJECTPATH/rpmbuilds/$NEWVERSION/SOURCES/
 cp $PROJECTPATH/versions/PYTHON $PROJECTPATH/migration/
@@ -84,9 +87,15 @@ cd $PROJECTPATH/versions/
 
 git switch --orphan $NEWVERSION
 
+if [ -f $PROJECTPATH/migration/PYTHON ]; then
+        cp $PROJECTPATH/migration/PYTHON $PROJECTPATH/versions/PYTHON
+fi
+
+mkdir -p $PROJECTPATH/versions/deps
+
 touch $PROJECTPATH/versions/VERSION-$NEWVERSION
 
-git add $PROJECTPATH/versions/VERSION-$NEWVERSION
+git add $PROJECTPATH/versions/*
 
 git commit -qam "Created Version $NEWVERSION"
 
