@@ -1,7 +1,0 @@
-#!/bin/bash
-
-source $(dirname "$0")/common-functions
-
-cd $PROJECTPATH/$PROJECTNAME
-
-poetry run pip list

@@ -11,6 +11,8 @@ echo "Generating SPECs for version $VERSION"
 PACKAGE=$1
 PACKAGEVERSION=$2
 
+cd $PROJECTPATH/$PROJECTNAME
+
 git stash
 git checkout -f -q devel
 git pull -q
